@@ -1,13 +1,15 @@
 <?php
 
+use App\Http\Controllers\DespesaController;
 use App\Http\Controllers\FinancasController;
+use App\Http\Controllers\ReceitaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/', [FinancasController::class, 'resumo']);
+Route::get('/resumo', [FinancasController::class, 'resumo'])->name('resumo');
 
 Route::get('/receitas/create', [ReceitaController::class, 'create'])->name('receitas.create');
 Route::post('/receitas', [ReceitaController::class, 'store'])->name('receitas.store');

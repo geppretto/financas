@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Despesa;
 use Illuminate\Http\Request;
 
 class DespesaController extends Controller

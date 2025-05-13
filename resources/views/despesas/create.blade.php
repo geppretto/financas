@@ -1,5 +1,5 @@
-<h1>Nova Receita</h1>
-<form action="{{ route('receitas.store') }}" method="POST">
+<h1>Nova Despesa</h1>
+<form action="{{ route('despesas.store') }}" method="POST">
     @csrf
     <label>Descrição:</label><br>
     <input type="text" name="descricao"><br>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Receita;
 use Illuminate\Http\Request;
 
 class ReceitaController extends Controller
