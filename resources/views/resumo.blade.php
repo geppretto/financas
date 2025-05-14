@@ -21,7 +21,7 @@
 </form>
 <h1>Resumo Financeiro do Mês</h1>
 
-<p><strong>Total Recebido:</strong> R$ {{ number_format($totalReceitas, 2, ',', '.') }}</p>
+<p><strong>Total Recebido:</strong> R$ {{ number_format($salarioAll, 2, ',', '.') }}</p>
 <p><strong>Total Gasto:</strong> R$ {{ number_format($totalDespesas, 2, ',', '.') }}</p>
 <p><strong>Saldo:</strong> R$ {{ number_format($saldo, 2, ',', '.') }}</p>
 
