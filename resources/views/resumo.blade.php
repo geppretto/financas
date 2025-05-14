@@ -22,14 +22,17 @@
 <h1>Resumo Financeiro do Mês</h1>
 
 <p><strong>Total Recebido:</strong> R$ {{ number_format($salarioAll, 2, ',', '.') }}</p>
-<p><strong>Total Gasto:</strong> R$ {{ number_format($totalDespesas, 2, ',', '.') }}</p>
+<p><strong>Total Gasto:</strong> R$ {{ number_format($despesasAll, 2, ',', '.') }}</p>
 <p><strong>Saldo:</strong> R$ {{ number_format($saldo, 2, ',', '.') }}</p>
 
 <h2>Receitas</h2>
 <ul>
+
 @foreach($receitas as $receita)
     <li>{{ $receita->data }} - {{ $receita->descricao }}: R$ {{ number_format($receita->valor, 2, ',', '.') }}</li>
 @endforeach
+
+    <li>{{ $salario->descricao }}: R$ {{ number_format($salario->valor, 2, ',', '.') }}</li>
 </ul>
 
 <h2>Despesas</h2>
@@ -37,4 +40,5 @@
 @foreach($despesas as $despesa)
     <li>{{ $despesa->data }} - {{ $despesa->descricao }}: R$ {{ number_format($despesa->valor, 2, ',', '.') }}</li>
 @endforeach
+    <li>{{ $despesasSempre->descricao }}: R$ {{ number_format($despesasSempre->valor, 2, ',', '.') }}</li>
 </ul>

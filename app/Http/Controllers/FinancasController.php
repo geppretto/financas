@@ -15,14 +15,19 @@ public function resumo(Request $request)
     $ano = $request->input('ano') ?? now()->format('Y');
 
     $salario = Receita::where('id', '1')->first();
+    $despesasSempre = Despesa::where('id', '4')->first();
+
     $receitas = Receita::whereMonth('data', $mes)->whereYear('data', $ano)->get();
     $despesas = Despesa::whereMonth('data', $mes)->whereYear('data', $ano)->get();
     $totalReceitas = $receitas->sum('valor');
-    $salarioAll = $salario->valor + $totalReceitas;
     $totalDespesas = $despesas->sum('valor');
-    $saldo = $salarioAll - $totalDespesas;
-    // dd($totalReceitas);
 
-    return view('resumo', compact('receitas', 'despesas', 'totalReceitas', 'totalDespesas', 'saldo', 'mes', 'ano', 'salarioAll'));
+    $salarioAll = $salario->valor + $totalReceitas;
+    $despesasAll = $despesasSempre->valor + $totalDespesas;
+
+    $saldo = $salarioAll - $despesasAll;
+    // dd($salario);
+
+    return view('resumo', compact('receitas', 'despesas', 'totalReceitas', 'totalDespesas', 'saldo', 'mes', 'ano', 'salario', 'despesasSempre', 'salarioAll', 'despesasAll'));
 }
 }
