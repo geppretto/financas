@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Receita extends Model
 {
-    protected $fillable = ['descricao', 'valor', 'data'];
+    protected $fillable = ['descricao', 'valor', 'data', 'pago'];
 }

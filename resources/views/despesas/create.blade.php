@@ -1,45 +1,66 @@
-<h1>Nova Despesa</h1>
-<form action="{{ route('despesas.store') }}" method="POST">
-    @csrf
+@extends('layouts.app')
 
-    <label>Descrição:</label><br>
-    <input type="text" name="descricao"><br>
+@section('content')
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h3 class="mb-0">Nova Despesa</h3>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('despesas.store') }}" method="POST">
+                @csrf
 
-    <label>Valor:</label><br>
-    <input type="number" step="0.01" name="valor"><br>
+                <div class="mb-3">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <input type="text" class="form-control" id="descricao" name="descricao" required>
+                </div>
 
-    <label>Data:</label><br>
-    <input type="date" name="data"><br>
+                <div class="mb-3">
+                    <label for="valor" class="form-label">Valor (R$)</label>
+                    <input type="number" step="0.01" class="form-control" id="valor" name="valor" required>
+                </div>
 
-    <!-- Checkbox: Tem parcelas -->
-    <label>
-        <input type="checkbox" id="tem_parcelas" name="tem_parcelas">
-        Tem parcelas?
-    </label><br>
+                <div class="mb-3">
+                    <label for="data" class="form-label">Data</label>
+                    <input type="date" class="form-control" id="data" name="data" required>
+                </div>
 
-    <!-- Campo: Quantidade de parcelas -->
-    <div id="parcelas_opcoes" style="display: none; margin-top: 10px;">
-        <label>Quantidade de parcelas:</label><br>
-        <input type="number" id="quantidade_parcelas" name="quantidade_parcelas" min="2"><br>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="tem_parcelas" name="tem_parcelas">
+                    <label class="form-check-label" for="tem_parcelas">Tem parcelas?</label>
+                </div>
 
-        <!-- Escolha se os valores são iguais -->
-        <label>Parcelas com o mesmo valor?</label><br>
-        <select id="parcelas_iguais" name="parcelas_iguais">
-            <option value="">Selecione</option>
-            <option value="1">Sim</option>
-            <option value="0">Não</option>
-        </select>
+                <!-- Opções de parcelas -->
+                <div id="parcelas_opcoes" style="display: none;">
+                    <div class="mb-3">
+                        <label for="quantidade_parcelas" class="form-label">Quantidade de parcelas</label>
+                        <input type="number" class="form-control" id="quantidade_parcelas" name="quantidade_parcelas" min="2">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="parcelas_iguais" class="form-label">Parcelas com o mesmo valor?</label>
+                        <select class="form-select" id="parcelas_iguais" name="parcelas_iguais">
+                            <option value="">Selecione</option>
+                            <option value="1">Sim</option>
+                            <option value="0">Não</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Parcelas com valores diferentes -->
+                <div id="parcelas_diferentes_campos" style="display: none;">
+                    <div class="alert alert-info">
+                        <strong>Informe o valor e a data de cada parcela:</strong>
+                    </div>
+                    <div id="parcelas_campos"></div>
+                </div>
+
+                <button type="submit" class="btn btn-danger mt-3">Salvar Despesa</button>
+                <a href="{{ route('resumo') }}" class="btn btn-secondary mt-3">Cancelar</a>
+            </form>
+        </div>
     </div>
-
-    <!-- Campos para valores e datas diferentes -->
-    <div id="parcelas_diferentes_campos" style="display: none; margin-top: 10px;">
-        <h4>Informe o valor e a data de cada parcela:</h4>
-        <div id="parcelas_campos"></div>
-    </div>
-
-    <br>
-    <button type="submit">Salvar</button>
-</form>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -79,11 +100,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!isNaN(quantidade) && quantidade > 1) {
             for (let i = 0; i < quantidade; i++) {
                 const div = document.createElement('div');
+                div.classList.add('mb-3', 'border', 'p-3', 'rounded', 'bg-light');
                 div.innerHTML = `
-                    <label>Parcela ${i + 1} - Valor:</label><br>
-                    <input type="number" step="0.01" name="valor_parcela[]" required><br>
-                    <label>Parcela ${i + 1} - Data:</label><br>
-                    <input type="date" name="data_parcela[]" required><br><br>
+                    <label class="form-label">Parcela ${i + 1} - Valor (R$)</label>
+                    <input type="number" step="0.01" name="valor_parcela[]" class="form-control mb-2" required>
+
+                    <label class="form-label">Parcela ${i + 1} - Data</label>
+                    <input type="date" name="data_parcela[]" class="form-control" required>
                 `;
                 parcelasCamposContainer.appendChild(div);
             }
@@ -94,3 +117,4 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+@endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Despesa;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class DespesaController extends Controller
@@ -52,6 +53,7 @@ class DespesaController extends Controller
                         'descricao' => $request->descricao . " (Parcela " . ($i + 1) . "/" . $quantidadeParcelas . ")",
                         'valor' => $request->valor_parcela[$i],
                         'data' => $request->data_parcela[$i],
+                        'user_id' => Auth::id()
                     ]);
                 }
             }
@@ -62,9 +64,19 @@ class DespesaController extends Controller
                 'descricao' => $request->descricao,
                 'valor' => $request->valor,
                 'data' => $request->data,
+                'user_id' => Auth::id()
+
             ]);
         }
 
         return redirect('/resumo')->with('success', 'Despesa(s) cadastrada(s) com sucesso!');
     }
+public function marcarComoPago(Request $request, $id)
+{
+    $despesa = Despesa::findOrFail($id);
+    $despesa->pago = $request->pago;
+    $despesa->save();
+
+    return response()->json(['success' => true]);
+}
 }
