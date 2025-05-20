@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Despesa extends Model
 {
-    protected $fillable = ['descricao', 'valor', 'data'];
+    protected $fillable = ['descricao', 'valor', 'data', 'user_id'];
 
 }

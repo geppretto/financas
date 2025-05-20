@@ -37,6 +37,7 @@ class DespesaController extends Controller
                         'descricao' => $request->descricao . " (Parcela " . ($i + 1) . "/" . $quantidadeParcelas . ")",
                         'valor' => $valorParcela,
                         'data' => date('Y-m-d', strtotime("+$i month", strtotime($dataInicial))),
+                        'user_id' => Auth::id()
                     ]);
                 }
 
