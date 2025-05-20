@@ -7,7 +7,7 @@
             <h3 class="mb-0">Nova Receita</h3>
         </div>
         <div class="card-body">
-            <form action="{{ route('receitas.store') }}">
+            <form action="{{ route('receitas.store') }}" method="POST">
                 @csrf
 
                 <div class="mb-3">

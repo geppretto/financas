@@ -90,36 +90,38 @@
         </thead>
         <tbody>
             @foreach($receitas as $receita)
-            @php
-                $pago = $pagamentosReceitas[$receita->id] ?? false;
-            @endphp
-<tr class="linha-pago {{ $pago ? 'table-success' : 'table-danger' }}">
-    <td>{{ $receita->data }}</td>
-    <td>{{ $receita->descricao }}</td>
-    <td>R$ {{ number_format($receita->valor, 2, ',', '.') }}</td>
-    <td>
-        <input 
-            type="checkbox" 
-            class="form-check-input marcar-pago" 
-            data-id="{{ $receita->id }}" 
-            data-type="receita"
-            {{ $pago ? 'checked' : '' }}>
-    </td>
-</tr>
-@endforeach
+                @php
+    $pago = $receita->data
+        ? ($receitasComData[$receita->id] ?? false)
+        : ($pagamentosReceitas[$receita->id] ?? false);
+@endphp
+                <tr class="linha-pago {{ $pago ? 'table-success' : 'table-danger' }}">
+                    <td>{{ $receita->data }}</td>
+                    <td>{{ $receita->descricao }}</td>
+                    <td>R$ {{ number_format($receita->valor, 2, ',', '.') }}</td>
+                    <td>
+                        <input 
+                            type="checkbox" 
+                            class="form-check-input marcar-pago" 
+                            data-id="{{ $receita->id }}" 
+                            data-type="receitas"
+                            {{ $pago ? 'checked' : '' }}>
+                    </td>
+                </tr>
+            @endforeach
            <tr class="linha-pago {{ $salarioPago ? 'table-success' : 'table-danger' }}">
-    <td>Mensal</td>
-    <td>{{ $salario->descricao }}</td>
-    <td>R$ {{ number_format($salario->valor, 2, ',', '.') }}</td>
-    <td>
-        <input 
-            type="checkbox" 
-            class="form-check-input marcar-pago" 
-            data-id="{{ $salario->id }}" 
-            data-type="receitas"
-            {{ $salarioPago ? 'checked' : '' }}>
-    </td>
-</tr>
+                <td>Mensal</td>
+                <td>{{ $salario->descricao }}</td>
+                <td>R$ {{ number_format($salario->valor, 2, ',', '.') }}</td>
+                <td>
+                    <input 
+                        type="checkbox" 
+                        class="form-check-input marcar-pago" 
+                        data-id="{{ $salario->id }}" 
+                        data-type="receitas"
+                        {{ $salarioPago ? 'checked' : '' }}>
+                </td>
+            </tr>
         </tbody>
     </table>
     <h2>Despesas</h2>
@@ -134,6 +136,11 @@
         </thead>
         <tbody>
             @foreach($despesas as $despesa)
+            @php
+    $pago = $despesa->data
+        ? ($despesasComData[$despesa->id] ?? false)
+        : ($pagamentosdespesas[$despesa->id] ?? false);
+@endphp
 <tr class="linha-pago {{ $despesa->pago ? 'table-success' : 'table-danger' }}">
     <td>{{ $despesa->data ?? 'Mensal' }}</td>
     <td>{{ $despesa->descricao }}</td>

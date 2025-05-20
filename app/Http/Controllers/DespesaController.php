@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Despesa;
+use App\Models\PagamentoMensal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
@@ -39,7 +40,7 @@ class DespesaController extends Controller
                     ]);
                 }
 
-            // Parcelas com valores e datas diferentes
+                // Parcelas com valores e datas diferentes
             } else {
                 $request->validate([
                     'valor_parcela' => 'required|array',
@@ -57,7 +58,6 @@ class DespesaController extends Controller
                     ]);
                 }
             }
-
         } else {
             // Despesa única (sem parcelas)
             Despesa::create([
@@ -71,12 +71,39 @@ class DespesaController extends Controller
 
         return redirect('/resumo')->with('success', 'Despesa(s) cadastrada(s) com sucesso!');
     }
-public function marcarComoPago(Request $request, $id)
-{
-    $despesa = Despesa::findOrFail($id);
-    $despesa->pago = $request->pago;
-    $despesa->save();
+    public function marcarComoPago(Request $request, $id)
+    {
+        try {
+            $userId = auth()->id();
+            $mes = $request->input('mes') ?? now()->format('Y-m');
+            $pago = $request->boolean('pago');
 
-    return response()->json(['success' => true]);
-}
+            $receita = Despesa::where('id', $id)->where('user_id', $userId)->firstOrFail();
+
+            if ($receita->data) {
+                // Receita com data => grava direto no campo "pago"
+                $receita->pago = $pago;
+                $receita->save();
+            } else {
+                // Receita mensal => usa a tabela de pagamentos mensais
+                PagamentoMensal::updateOrCreate(
+                    [
+                        'user_id' => $userId,
+                        'despesa_id' => $id,
+                        'mes' => $mes,
+                    ],
+                    [
+                        'pago' => $pago,
+                    ]
+                );
+            }
+
+            return response()->json(['success' => true]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

@@ -52,10 +52,17 @@ class FinancasController extends Controller
             ->where('user_id', $userId)
             ->get();
 
+        $receitasComData = $receitas->keyBy('id')->mapWithKeys(function ($r) {
+            return [$r->id => $r->pago];
+        })->toArray();
+
         $despesas = Despesa::whereMonth('data', $mes)
             ->whereYear('data', $ano)
             ->where('user_id', $userId)
             ->get();
+        $despesasComData = $despesas->keyBy('id')->mapWithKeys(function ($r) {
+            return [$r->id => $r->pago];
+        })->toArray();
 
         $totalReceitas = $receitas->sum('valor');
         $totalDespesas = $despesas->sum('valor');
@@ -64,6 +71,7 @@ class FinancasController extends Controller
         $despesasAll = ($despesasSempre->valor ?? 0) + $totalDespesas;
 
         $saldo = $salarioAll - $despesasAll;
+        // dd($despesas);
 
         return view('resumo', compact(
             'receitas',
@@ -81,7 +89,9 @@ class FinancasController extends Controller
             'pagamentosReceitas',
             'pagamentosDespesas',
             'salarioPago',
-            'despesaSemprePago'
+            'despesaSemprePago',
+            'receitasComData',
+            'despesasComData',
         ));
     }
 }
