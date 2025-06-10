@@ -111,7 +111,7 @@
             @endforeach
            <tr class="linha-pago {{ $salarioPago ? 'table-success' : 'table-danger' }}">
                 <td>Mensal</td>
-                <td>{{ $salario->descricao }}</td>
+                <td>{{ $salario?->descricao ?? '-' }}</td>
                 <td>R$ {{ number_format($salario->valor, 2, ',', '.') }}</td>
                 <td>
                     <input 
