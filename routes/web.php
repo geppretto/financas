@@ -10,6 +10,9 @@ use App\Http\Controllers\ReceitaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    if (!auth()->check()) {
+        return redirect()->route('login');
+    }
     return view('welcome');
 });
 
@@ -32,7 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/receitas/create', [ReceitaController::class, 'create'])->name('receitas.create');
     Route::post('/receitas', [ReceitaController::class, 'store'])->name('receitas.store');
     Route::patch('/receitas/{id}/pagar', [ReceitaController::class, 'marcarComoPago'])->name('receitas.pagar');
-    
+
     // Despesas
     Route::get('/despesas/create', [DespesaController::class, 'create'])->name('despesas.create');
     Route::post('/despesas', [DespesaController::class, 'store'])->name('despesas.store');
