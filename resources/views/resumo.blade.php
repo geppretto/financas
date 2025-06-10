@@ -96,9 +96,9 @@
         : ($pagamentosReceitas[$receita->id] ?? false);
 @endphp
                 <tr class="linha-pago {{ $pago ? 'table-success' : 'table-danger' }}">
-                    <td>{{ $receita->data }}</td>
-                    <td>{{ $receita->descricao }}</td>
-                    <td>R$ {{ number_format($receita->valor, 2, ',', '.') }}</td>
+                    <td>{{ $receita->data ?? '-'}}</td>
+                    <td>{{ $receita->descricao ?? '-'}}</td>
+                    <td>R$ {{ number_format($receita->valor, 2, ',', '.') ?? '-'}}</td>
                     <td>
                         <input 
                             type="checkbox" 
@@ -112,7 +112,7 @@
            <tr class="linha-pago {{ $salarioPago ? 'table-success' : 'table-danger' }}">
                 <td>Mensal</td>
                 <td>{{ $salario?->descricao ?? '-' }}</td>
-                <td>R$ {{ number_format($salario->valor, 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($salario->valor, 2, ',', '.') ?? '-'}}</td>
                 <td>
                     <input 
                         type="checkbox" 
@@ -143,8 +143,8 @@
 @endphp
 <tr class="linha-pago {{ $despesa->pago ? 'table-success' : 'table-danger' }}">
     <td>{{ $despesa->data ?? 'Mensal' }}</td>
-    <td>{{ $despesa->descricao }}</td>
-    <td>R$ {{ number_format($despesa->valor, 2, ',', '.') }}</td>
+    <td>{{ $despesa->descricao ?? '-'}}</td>
+    <td>R$ {{ number_format($despesa->valor, 2, ',', '.') ?? '-'}}</td>
     <td>
         <input 
             type="checkbox" 
@@ -157,8 +157,8 @@
 @endforeach
             <tr class="linha-pago {{ $despesaSemprePago ? 'table-success' : 'table-danger' }}">
     <td>Mensal</td>
-    <td>{{ $despesasSempre->descricao }}</td>
-    <td>R$ {{ number_format($despesasSempre->valor, 2, ',', '.') }}</td>
+    <td>{{ $despesasSempre->descricao ?? '-'}}</td>
+    <td>R$ {{ number_format($despesasSempre->valor, 2, ',', '.') ?? '-'}}</td>
     <td>
         <input 
             type="checkbox" 
