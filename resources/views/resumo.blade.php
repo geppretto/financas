@@ -99,22 +99,34 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($receitas as $receita)
+                @forelse($receitas as $receita)
                     @php
-                        $pago = $receita->data
-                            ? ($receitasComData[$receita->id] ?? false)
-                            : ($pagamentosReceitas[$receita->id] ?? false);
+                    // dd($_GET['mes']);
+                    $mes = $_GET['ano'] . '-' . $_GET['mes'];
+                    
+                        $pago = App\Models\PagamentoMensal::where('receita_id', $receita->id)
+                        ->where('mes', $mes)->first();
+                        // dd($pago);
                     @endphp
-                    <tr class="linha-pago {{ $pago ? 'table-success' : 'table-danger' }}">
-                        <td>{{ $receita->data ?? 'Mensal'}}</td>
-                        <td>{{ $receita->descricao ?? '-'}}</td>
-                        <td>R$ {{ number_format($receita->valor, 2, ',', '.') ?? '-'}}</td>
-                        <td>
-                            <input type="checkbox" class="form-check-input marcar-pago" data-id="{{ $receita->id }}"
-                                data-type="receitas" {{ $pago ? 'checked' : '' }}>
+                    <tr class="{{ $pago->pago ? 'table-success' : 'table-danger' }}">
+                        <td>{{ $receita->data ? \Carbon\Carbon::parse($receita->data)->format('d/m/Y') : 'Mensal' }}</td>
+                        <td>{{ $receita->descricao ?? '-' }}</td>
+                        <td>R$ {{ number_format((float) $receita->valor, 2, ',', '.') }}</td>
+                        <td class="text-center">
+                            <input
+                                type="checkbox"
+                                class="form-check-input marcar-pago"
+                                data-id="{{ $receita->id }}"
+                                data-type="receitas"
+                                {{ $pago->pago ? 'checked' : '' }}
+                            >
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-3">Nenhuma receita encontrada.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
         <h2>Despesas</h2>
