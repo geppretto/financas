@@ -22,7 +22,7 @@
 
                 <div class="mb-3">
                     <label for="data" class="form-label">Data</label>
-                    <input type="date" class="form-control" id="data" name="data" required>
+                    <input type="date" class="form-control" id="data" name="data">
                 </div>
 
                 <button type="submit" class="btn btn-success">Salvar Receita</button>

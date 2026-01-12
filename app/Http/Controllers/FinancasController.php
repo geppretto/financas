@@ -19,79 +19,38 @@ class FinancasController extends Controller
 
         $mes = $request->input('mes') ?? now()->format('m');
         $ano = $request->input('ano') ?? now()->format('Y');
-        $mesAno = "$ano-$mes";
 
-        // Pagamentos mensais: receitas e despesas
-        $pagamentosReceitas = PagamentoMensal::where('mes', $mesAno)
-            ->where('user_id', $userId)
-            ->whereNotNull('receita_id')
-            ->pluck('pago', 'receita_id')
-            ->toArray();
+        $totalReceitas = Receita::where('user_id', $userId)
+    ->where(function ($q) use ($mes, $ano) {
+        $q->where(function ($q2) use ($mes, $ano) {
+            $q2->whereMonth('data', $mes)
+               ->whereYear('data', $ano);
+        })
+        ->orWhereNull('data');
+    })
+    ->sum('valor');
 
-        $pagamentosDespesas = PagamentoMensal::where('mes', $mesAno)
-            ->where('user_id', $userId)
-            ->whereNotNull('despesa_id')
-            ->pluck('pago', 'despesa_id')
-            ->toArray();
-
-        $salario = Receita::where('id', '1')->where('user_id', $userId)->first();
-        $despesasSempre = Despesa::where('id', '4')->where('user_id', $userId)->first();
-
-        $salarioPago = PagamentoMensal::where('mes', $mesAno)
-            ->where('user_id', $userId)
-            ->where('receita_id', $salario?->id)
-            ->value('pago') ?? false;
-
-        $despesaSemprePago = PagamentoMensal::where('mes', $mesAno)
-            ->where('user_id', $userId)
-            ->where('despesa_id', $despesasSempre?->id)
-            ->value('pago') ?? false;
-
-        $receitas = Receita::whereMonth('data', $mes)
+        $totalDespesas = Despesa::whereMonth('data', $mes)
             ->whereYear('data', $ano)
             ->where('user_id', $userId)
-            ->get();
+            ->sum('valor');
 
-        $receitasComData = $receitas->keyBy('id')->mapWithKeys(function ($r) {
-            return [$r->id => $r->pago];
-        })->toArray();
+        $saldo = $totalReceitas - $totalDespesas;
 
-        $despesas = Despesa::whereMonth('data', $mes)
-            ->whereYear('data', $ano)
-            ->where('user_id', $userId)
-            ->get();
-        $despesasComData = $despesas->keyBy('id')->mapWithKeys(function ($r) {
-            return [$r->id => $r->pago];
-        })->toArray();
+        $receitas = Receita::whereMonth('data', $mes)->whereYear('data', $ano)->where('user_id', $userId)->orWhereNull('data')->get();
 
-        $totalReceitas = $receitas->sum('valor');
-        $totalDespesas = $despesas->sum('valor');
-
-        $salarioAll = ($salario->valor ?? 0) + $totalReceitas;
-        $despesasAll = ($despesasSempre->valor ?? 0) + $totalDespesas;
-
-        $saldo = $salarioAll - $despesasAll;
-        // dd($despesas);
+        // dd($receitas);
+        $despesas = Despesa::whereMonth('data', $mes)->whereYear('data', $ano)->where('user_id', $userId)->get();
 
         return view('resumo', compact(
-            'receitas',
-            'despesas',
+            'user',
             'totalReceitas',
             'totalDespesas',
-            'saldo',
             'mes',
             'ano',
-            'salario',
-            'despesasSempre',
-            'salarioAll',
-            'despesasAll',
-            'user',
-            'pagamentosReceitas',
-            'pagamentosDespesas',
-            'salarioPago',
-            'despesaSemprePago',
-            'receitasComData',
-            'despesasComData',
+            'receitas',
+            'saldo',
+            'despesas'
         ));
     }
 }

@@ -3,7 +3,17 @@
 @section('content')
     <div class="container my-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h1 class="text-primary">Resumo Financeiro {{strtoupper($user->name)}}</h1>
+            <div class="mb-4">
+                <h1 class="fw-bold text-primary mb-2">
+                    Resumo Financeiro
+                </h1>
+
+                <div class="d-flex align-items-center gap-3">
+                    <span class="fw-semibold fs-5">
+                        {{ strtoupper($user->name) }}
+                    </span>
+                </div>
+            </div>
             <div>
                 <a href="{{ route('receitas.create') }}" class="btn btn-success me-2">+ Nova Receita</a>
                 <a href="{{ route('despesas.create') }}" class="btn btn-danger">+ Nova Despesa</a>
@@ -40,7 +50,7 @@
                     <div class="card-header">Total Recebido</div>
                     <div class="card-body">
                         <h5 class="card-title d-flex align-items-center">
-                            <span class="valor-mascarado d-none">R$ {{ number_format($salarioAll, 2, ',', '.') }}</span>
+                            <span class="valor-mascarado d-none">R$ {{ number_format($totalReceitas, 2, ',', '.') }}</span>
                             <span class="valor-visivel">••••••</span>
                             <button type="button" class="btn btn-sm btn-light ms-2 toggle-valor" title="Mostrar/Ocultar">
                                 👁️
@@ -54,7 +64,7 @@
                     <div class="card-header">Total Gasto</div>
                     <div class="card-body">
                         <h5 class="card-title d-flex align-items-center">
-                            <span class="valor-mascarado d-none">R$ {{ number_format($despesasAll, 2, ',', '.') }}</span>
+                            <span class="valor-mascarado d-none">R$ {{ number_format($totalDespesas, 2, ',', '.') }}</span>
                             <span class="valor-visivel">••••••</span>
                             <button type="button" class="btn btn-sm btn-light ms-2 toggle-valor" title="Mostrar/Ocultar">
                                 👁️
@@ -96,7 +106,7 @@
                             : ($pagamentosReceitas[$receita->id] ?? false);
                     @endphp
                     <tr class="linha-pago {{ $pago ? 'table-success' : 'table-danger' }}">
-                        <td>{{ $receita->data ?? '-'}}</td>
+                        <td>{{ $receita->data ?? 'Mensal'}}</td>
                         <td>{{ $receita->descricao ?? '-'}}</td>
                         <td>R$ {{ number_format($receita->valor, 2, ',', '.') ?? '-'}}</td>
                         <td>
@@ -105,15 +115,6 @@
                         </td>
                     </tr>
                 @endforeach
-                <tr class="linha-pago {{ $salarioPago ? 'table-success' : 'table-danger' }}">
-                    <td>Mensal</td>
-                    <td>{{ $salario?->descricao ?? '-' }}</td>
-                    <td>R$ {{ number_format($salario?->valor ?? 0, 2, ',', '.') }}</td>
-                    <td>
-                        <input type="checkbox" class="form-check-input marcar-pago" data-id="{{ $salario?->id ?? '' }}"
-                            data-type="receitas" {{ $salarioPago ? 'checked' : '' }}>
-                    </td>
-                </tr>
             </tbody>
         </table>
         <h2>Despesas</h2>
@@ -143,7 +144,7 @@
                         </td>
                     </tr>
                 @endforeach
-                <tr class="linha-pago {{ $despesaSemprePago ? 'table-success' : 'table-danger' }}">
+                {{-- <tr class="linha-pago {{ $despesaSemprePago ? 'table-success' : 'table-danger' }}">
                     <td>Mensal</td>
                     <td>{{ $despesasSempre->descricao ?? '-'}}</td>
                     <td>R$ {{ number_format($despesasSempre?->valor ?? 0, 2, ',', '.') }}</td>
@@ -151,7 +152,7 @@
                         <input type="checkbox" class="form-check-input marcar-pago" data-id="{{ $despesasSempre?->id ?? '' }}"
                             data-type="despesas" {{ $despesaSemprePago ? 'checked' : '' }}>
                     </td>
-                </tr>
+                </tr> --}}
             </tbody>
         </table>
     </div>
