@@ -102,11 +102,10 @@
             <tbody>
                 @forelse($receitas as $receita)
                     @php
-                    // dd($_GET['mes']);
-                    $mes = $_GET['ano'] . '-' . $_GET['mes'];
+                        $mesAno = $_GET['ano'] . '-' . $_GET['mes'];
                     
                         $pago = App\Models\PagamentoMensal::where('receita_id', $receita->id)
-                        ->where('mes', $mes)->first();
+                        ->where('mes', $mesAno)->first();
                         // dd($pago);
                     @endphp
                     <tr class="{{ !empty($pago->pago) ? 'table-success' : 'table-danger' }}">
