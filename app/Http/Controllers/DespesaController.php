@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Despesa;
 use App\Models\PagamentoMensal;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,12 @@ class DespesaController extends Controller
 {
     public function create()
     {
-        return view('despesas.create');
+        $data = now()->addMonth();
+
+        $mes = $data->format('m');
+        $ano = $data->format('Y');
+
+        return view('despesas.create', compact('mes', 'ano'));
     }
 
     public function store(Request $request)
@@ -106,5 +112,41 @@ class DespesaController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+    public function edit($id)
+    {
+        $data = now()->addMonth();
+
+        $mes = $data->format('m');
+        $ano = $data->format('Y');
+        $categories = Category::all();
+
+        $despesa = Despesa::find($id);
+        $despesas = Despesa::where('user_id', auth()->id())->where('category_id', $despesa->category_id)->get();
+
+        return view('despesas.edit', compact('despesa', 'mes', 'ano', 'categories', 'despesas'));
+    }
+    public function update(Request $request, $id)
+    {
+        $data = now()->addMonth();
+        $mes = $data->format('m');
+        $ano = $data->format('Y');
+
+        $despesa = Despesa::findOrFail($id);
+        $despesas = Despesa::where('user_id', auth()->id())->where('category_id', $despesa->category_id)->get();
+        $despesa->update([
+            'descricao' => $request->descricao,
+            'category_id' => $request->category_id,
+            'valor' => $request->valor,
+            'data' => $request->data,
+            'user_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('despesas.edit', [
+            'id' => $despesa->id,
+            'mes' => $mes,
+            'ano' => $ano,
+            'despesas' => $despesas,
+        ])->with('success', 'Despesa atualizada com sucesso!');
     }
 }

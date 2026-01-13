@@ -17,6 +17,7 @@
             <div>
                 <a href="{{ route('receitas.create') }}" class="btn btn-success me-2">+ Nova Receita</a>
                 <a href="{{ route('despesas.create') }}" class="btn btn-danger">+ Nova Despesa</a>
+                <a href="{{ route('categories.create') }}" class="btn btn-primary">Nova Categoria</a>
             </div>
         </div>
 
@@ -108,7 +109,7 @@
                         ->where('mes', $mes)->first();
                         // dd($pago);
                     @endphp
-                    <tr class="{{ $pago->pago ? 'table-success' : 'table-danger' }}">
+                    <tr class="{{ !empty($pago->pago) ? 'table-success' : 'table-danger' }}">
                         <td>{{ $receita->data ? \Carbon\Carbon::parse($receita->data)->format('d/m/Y') : 'Mensal' }}</td>
                         <td>{{ $receita->descricao ?? '-' }}</td>
                         <td>R$ {{ number_format((float) $receita->valor, 2, ',', '.') }}</td>
@@ -118,7 +119,7 @@
                                 class="form-check-input marcar-pago"
                                 data-id="{{ $receita->id }}"
                                 data-type="receitas"
-                                {{ $pago->pago ? 'checked' : '' }}
+                                {{ !empty($pago->pago) ? 'checked' : '' }}
                             >
                         </td>
                     </tr>
@@ -135,8 +136,10 @@
                 <tr>
                     <th>Data</th>
                     <th>Descrição</th>
+                    <th>Categoria</th>
                     <th>Valor</th>
                     <th>Pago</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -149,11 +152,15 @@
                     <tr class="linha-pago {{ $despesa->pago ? 'table-success' : 'table-danger' }}">
                         <td>{{ $despesa->data ?? 'Mensal' }}</td>
                         <td>{{ $despesa->descricao ?? '-'}}</td>
+                        <td>{{ $despesa->category->name ?? '-' }}</td>
                         <td>R$ {{ number_format($despesa->valor, 2, ',', '.') ?? '-'}}</td>
                         <td>
                             <input type="checkbox" class="form-check-input marcar-pago" data-id="{{ $despesa->id }}"
                                 data-type="despesas" {{ $despesa->pago ? 'checked' : '' }}>
                         </td>
+                        <td><a class="btn btn-primary" href="{{ route('despesas.edit', $despesa->id) }}">
+                            Editar
+                        </a></td>
                     </tr>
                 @endforeach
                 {{-- <tr class="linha-pago {{ $despesaSemprePago ? 'table-success' : 'table-danger' }}">

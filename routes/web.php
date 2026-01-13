@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\DespesaController;
 use App\Http\Controllers\FinancasController;
 use App\Http\Controllers\ReceitaController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -40,6 +41,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/despesas/create', [DespesaController::class, 'create'])->name('despesas.create');
     Route::post('/despesas', [DespesaController::class, 'store'])->name('despesas.store');
     Route::patch('/despesas/{id}/pagar', [DespesaController::class, 'marcarComoPago'])->name('despesas.pagar');
+    Route::get('/despesas/edit/{id}', [DespesaController::class, 'edit'])->name('despesas.edit');
+    Route::put('/despesas/{id}', [DespesaController::class, 'update'])->name('despesas.update');
+
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
 });
 
 

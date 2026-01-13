@@ -21,14 +21,14 @@ class FinancasController extends Controller
         $ano = $request->input('ano') ?? now()->format('Y');
 
         $totalReceitas = Receita::where('user_id', $userId)
-    ->where(function ($q) use ($mes, $ano) {
-        $q->where(function ($q2) use ($mes, $ano) {
-            $q2->whereMonth('data', $mes)
-               ->whereYear('data', $ano);
+        ->where(function ($q) use ($mes, $ano) {
+            $q->where(function ($q2) use ($mes, $ano) {
+                $q2->whereMonth('data', $mes)
+                ->whereYear('data', $ano);
+            })
+            ->orWhereNull('data');
         })
-        ->orWhereNull('data');
-    })
-    ->sum('valor');
+        ->sum('valor');
 
         $totalDespesas = Despesa::whereMonth('data', $mes)
             ->whereYear('data', $ano)
@@ -40,7 +40,7 @@ class FinancasController extends Controller
         $receitas = Receita::whereMonth('data', $mes)->whereYear('data', $ano)->where('user_id', $userId)->orWhereNull('data')->get();
 
         // dd($receitas);
-        $despesas = Despesa::whereMonth('data', $mes)->whereYear('data', $ano)->where('user_id', $userId)->get();
+        $despesas = Despesa::whereMonth('data', $mes)->whereYear('data', $ano)->with('category')->where('user_id', $userId)->get();
 
         return view('resumo', compact(
             'user',

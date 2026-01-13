@@ -8,17 +8,17 @@
             <div class="text-end"><a href="{{ route('resumo', ['mes' => $mes, 'ano' => $ano]) }}" class="btn btn-secondary">Volta</a></div>
         </div>
         <div class="card-body">
-            <form action="{{ route('despesas.store') }}" method="POST">
+            <form action="{{ route('despesas.update') }}" method="get">
                 @csrf
 
                 <div class="mb-3">
                     <label for="descricao" class="form-label">Descrição</label>
-                    <input type="text" class="form-control" id="descricao" name="descricao" required>
+                    <input type="text" class="form-control" value="{{ $despesa->descricao }}" id="descricao" name="descricao" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="valor" class="form-label">Valor (R$)</label>
-                    <input type="number" step="0.01" class="form-control" id="valor" name="valor" required>
+                    <input type="number" step="0.01" value="{{ $despesa->valor }}" class="form-control" id="valor" name="valor" required>
                 </div>
 
                 <div class="mb-3">

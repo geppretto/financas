@@ -4,59 +4,19 @@
 <div class="container mt-4">
     <div class="card shadow-sm">
         <div class="card-header bg-danger text-white">
-            <h3 class="mb-0">Nova Despesa</h3>
+            <h3 class="mb-0">Nova Categoria</h3>
             <div class="text-end"><a href="{{ route('resumo', ['mes' => $mes, 'ano' => $ano]) }}" class="btn btn-secondary">Volta</a></div>
         </div>
         <div class="card-body">
-            <form action="{{ route('despesas.store') }}" method="POST">
+            <form action="{{ route('categories.store') }}" method="POST">
                 @csrf
 
                 <div class="mb-3">
-                    <label for="descricao" class="form-label">Descrição</label>
-                    <input type="text" class="form-control" id="descricao" name="descricao" required>
+                    <label for="name" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
                 </div>
 
-                <div class="mb-3">
-                    <label for="valor" class="form-label">Valor (R$)</label>
-                    <input type="number" step="0.01" class="form-control" id="valor" name="valor" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="data" class="form-label">Data</label>
-                    <input type="date" class="form-control" id="data" name="data" required>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input type="checkbox" class="form-check-input" id="tem_parcelas" name="tem_parcelas">
-                    <label class="form-check-label" for="tem_parcelas">Tem parcelas?</label>
-                </div>
-
-                <!-- Opções de parcelas -->
-                <div id="parcelas_opcoes" style="display: none;">
-                    <div class="mb-3">
-                        <label for="quantidade_parcelas" class="form-label">Quantidade de parcelas</label>
-                        <input type="number" class="form-control" id="quantidade_parcelas" name="quantidade_parcelas" min="2">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="parcelas_iguais" class="form-label">Parcelas com o mesmo valor?</label>
-                        <select class="form-select" id="parcelas_iguais" name="parcelas_iguais">
-                            <option value="">Selecione</option>
-                            <option value="1">Sim</option>
-                            <option value="0">Não</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Parcelas com valores diferentes -->
-                <div id="parcelas_diferentes_campos" style="display: none;">
-                    <div class="alert alert-info">
-                        <strong>Informe o valor e a data de cada parcela:</strong>
-                    </div>
-                    <div id="parcelas_campos"></div>
-                </div>
-
-                <button type="submit" class="btn btn-danger mt-3">Salvar Despesa</button>
+                <button type="submit" class="btn btn-danger mt-3">Salvar Categoria</button>
                 <a href="{{ route('resumo') }}" class="btn btn-secondary mt-3">Cancelar</a>
             </form>
         </div>
