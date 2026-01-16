@@ -37,9 +37,9 @@ class FinancasController extends Controller
 
         $saldo = $totalReceitas - $totalDespesas;
 
-        $receitas = Receita::whereMonth('data', $mes)->whereYear('data', $ano)->where('user_id', $userId)->orWhereNull('data')->get();
+        $receitas = Receita::where('user_id', $userId)->whereNull('data')->get();
 
-        // dd($receitas);
+        // dd($receitas, $userId);
         $despesas = Despesa::whereMonth('data', $mes)->whereYear('data', $ano)->with('category')->where('user_id', $userId)->get();
 
         return view('resumo', compact(

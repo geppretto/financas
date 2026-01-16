@@ -17,6 +17,18 @@
                 </div>
 
                 <div class="mb-3">
+                        <label for="category_id" class="form-label">Categoria</label>
+                        <select class="form-select" id="category_id" name="category_id">
+                            <option value="">Selecione</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                <div class="mb-3">
                     <label for="valor" class="form-label">Valor (R$)</label>
                     <input type="number" step="0.01" class="form-control" id="valor" name="valor" required>
                 </div>

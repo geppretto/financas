@@ -199,7 +199,7 @@
 
                 const linha = this.closest('tr');
 
-                fetch(`/${type}/${id}/pagar`, {
+                fetch(`{{ url('/') }}/${type}/${id}/pagar`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',

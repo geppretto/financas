@@ -16,8 +16,9 @@ class DespesaController extends Controller
 
         $mes = $data->format('m');
         $ano = $data->format('Y');
+        $categories = Category::all();
 
-        return view('despesas.create', compact('mes', 'ano'));
+        return view('despesas.create', compact('mes', 'ano', 'categories'));
     }
 
     public function store(Request $request)
@@ -71,6 +72,7 @@ class DespesaController extends Controller
                 'descricao' => $request->descricao,
                 'valor' => $request->valor,
                 'data' => $request->data,
+                'category_id' => $request->category_id,
                 'user_id' => Auth::id()
 
             ]);
