@@ -121,7 +121,7 @@ class DespesaController extends Controller
 
         $mes = $data->format('m');
         $ano = $data->format('Y');
-        $categories = Category::all();
+        $categories = Category::where('user_id', auth()->id())->get();
 
         $despesa = Despesa::find($id);
         $despesas = Despesa::where('user_id', auth()->id())->where('category_id', $despesa->category_id)->get();
