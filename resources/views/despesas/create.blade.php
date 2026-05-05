@@ -1,77 +1,84 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-danger text-white">
-            <h3 class="mb-0">Nova Despesa</h3>
-            <div class="text-end"><a href="{{ route('resumo', ['mes' => $mes, 'ano' => $ano]) }}" class="btn btn-secondary">Volta</a></div>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('despesas.store') }}" method="POST">
-                @csrf
+<div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <h1 class="page-title mb-1">Nova despesa</h1>
+        <p class="text-muted mb-0">Lance uma saída simples ou divida em parcelas.</p>
+    </div>
+    <a href="{{ route('resumo', ['mes' => $mes, 'ano' => $ano]) }}" class="btn btn-outline-secondary">Voltar</a>
+</div>
 
-                <div class="mb-3">
-                    <label for="descricao" class="form-label">Descrição</label>
-                    <input type="text" class="form-control" id="descricao" name="descricao" required>
+<div class="panel">
+    <div class="panel-header">
+        <h2 class="h5 mb-0">Dados da despesa</h2>
+    </div>
+    <div class="p-4">
+        <form action="{{ route('despesas.store') }}" method="POST" class="row g-3">
+            @csrf
+
+            <div class="col-12">
+                <label for="descricao" class="form-label">Descrição</label>
+                <input type="text" class="form-control" id="descricao" name="descricao" value="{{ old('descricao') }}" required>
+            </div>
+
+            <div class="col-md-4">
+                <label for="category_id" class="form-label">Categoria</label>
+                <select class="form-select" id="category_id" name="category_id">
+                    <option value="">Sem categoria</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="valor" class="form-label">Valor (R$)</label>
+                <input type="number" step="0.01" min="0.01" class="form-control" id="valor" name="valor" value="{{ old('valor') }}" required>
+            </div>
+
+            <div class="col-md-4">
+                <label for="data" class="form-label">Data</label>
+                <input type="date" class="form-control" id="data" name="data" value="{{ old('data') }}" required>
+            </div>
+
+            <div class="col-12">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="tem_parcelas" name="tem_parcelas" {{ old('tem_parcelas') ? 'checked' : '' }}>
+                    <label class="form-check-label" for="tem_parcelas">Dividir em parcelas</label>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                        <label for="category_id" class="form-label">Categoria</label>
-                        <select class="form-select" id="category_id" name="category_id">
-                            <option value="">Selecione</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}">
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                <div class="mb-3">
-                    <label for="valor" class="form-label">Valor (R$)</label>
-                    <input type="number" step="0.01" class="form-control" id="valor" name="valor" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="data" class="form-label">Data</label>
-                    <input type="date" class="form-control" id="data" name="data" required>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input type="checkbox" class="form-check-input" id="tem_parcelas" name="tem_parcelas">
-                    <label class="form-check-label" for="tem_parcelas">Tem parcelas?</label>
-                </div>
-
-                <!-- Opções de parcelas -->
-                <div id="parcelas_opcoes" style="display: none;">
-                    <div class="mb-3">
+            <div id="parcelas_opcoes" class="col-12 {{ old('tem_parcelas') ? '' : 'd-none' }}">
+                <div class="row g-3 p-3 border rounded bg-light">
+                    <div class="col-md-6">
                         <label for="quantidade_parcelas" class="form-label">Quantidade de parcelas</label>
-                        <input type="number" class="form-control" id="quantidade_parcelas" name="quantidade_parcelas" min="2">
+                        <input type="number" class="form-control" id="quantidade_parcelas" name="quantidade_parcelas" min="2" max="120" value="{{ old('quantidade_parcelas') }}">
                     </div>
 
-                    <div class="mb-3">
+                    <div class="col-md-6">
                         <label for="parcelas_iguais" class="form-label">Parcelas com o mesmo valor?</label>
                         <select class="form-select" id="parcelas_iguais" name="parcelas_iguais">
                             <option value="">Selecione</option>
-                            <option value="1">Sim</option>
-                            <option value="0">Não</option>
+                            <option value="1" {{ old('parcelas_iguais') === '1' ? 'selected' : '' }}>Sim</option>
+                            <option value="0" {{ old('parcelas_iguais') === '0' ? 'selected' : '' }}>Não</option>
                         </select>
                     </div>
                 </div>
+            </div>
 
-                <!-- Parcelas com valores diferentes -->
-                <div id="parcelas_diferentes_campos" style="display: none;">
-                    <div class="alert alert-info">
-                        <strong>Informe o valor e a data de cada parcela:</strong>
-                    </div>
-                    <div id="parcelas_campos"></div>
-                </div>
+            <div id="parcelas_diferentes_campos" class="col-12 d-none">
+                <div class="alert alert-info mb-3">Informe o valor e a data de cada parcela.</div>
+                <div id="parcelas_campos" class="row g-3"></div>
+            </div>
 
-                <button type="submit" class="btn btn-danger mt-3">Salvar Despesa</button>
-                <a href="{{ route('resumo') }}" class="btn btn-secondary mt-3">Cancelar</a>
-            </form>
-        </div>
+            <div class="col-12 d-flex flex-wrap gap-2 mt-2">
+                <button type="submit" class="btn btn-danger">Salvar despesa</button>
+                <a href="{{ route('resumo') }}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -85,9 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const quantidadeParcelasInput = document.getElementById('quantidade_parcelas');
 
     temParcelas.addEventListener('change', function () {
-        opcoesParcelas.style.display = this.checked ? 'block' : 'none';
+        opcoesParcelas.classList.toggle('d-none', !this.checked);
         if (!this.checked) {
-            parcelasDiferentesCampos.style.display = 'none';
+            parcelasDiferentesCampos.classList.add('d-none');
             parcelasCamposContainer.innerHTML = '';
         }
     });
@@ -96,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (this.value === '0') {
             gerarCamposParcelas();
         } else {
-            parcelasDiferentesCampos.style.display = 'none';
+            parcelasDiferentesCampos.classList.add('d-none');
             parcelasCamposContainer.innerHTML = '';
         }
     });
@@ -110,23 +117,29 @@ document.addEventListener('DOMContentLoaded', function () {
     function gerarCamposParcelas() {
         const quantidade = parseInt(quantidadeParcelasInput.value);
         parcelasCamposContainer.innerHTML = '';
-        if (!isNaN(quantidade) && quantidade > 1) {
-            for (let i = 0; i < quantidade; i++) {
-                const div = document.createElement('div');
-                div.classList.add('mb-3', 'border', 'p-3', 'rounded', 'bg-light');
-                div.innerHTML = `
-                    <label class="form-label">Parcela ${i + 1} - Valor (R$)</label>
-                    <input type="number" step="0.01" name="valor_parcela[]" class="form-control mb-2" required>
 
-                    <label class="form-label">Parcela ${i + 1} - Data</label>
-                    <input type="date" name="data_parcela[]" class="form-control" required>
-                `;
-                parcelasCamposContainer.appendChild(div);
-            }
-            parcelasDiferentesCampos.style.display = 'block';
-        } else {
-            parcelasDiferentesCampos.style.display = 'none';
+        if (!Number.isInteger(quantidade) || quantidade < 2) {
+            parcelasDiferentesCampos.classList.add('d-none');
+            return;
         }
+
+        for (let i = 0; i < quantidade; i++) {
+            const div = document.createElement('div');
+            div.classList.add('col-md-6');
+            div.innerHTML = `
+                <div class="border rounded bg-light p-3 h-100">
+                    <h3 class="h6 mb-3">Parcela ${i + 1}</h3>
+                    <label class="form-label">Valor (R$)</label>
+                    <input type="number" step="0.01" min="0.01" name="valor_parcela[]" class="form-control mb-3" required>
+
+                    <label class="form-label">Data</label>
+                    <input type="date" name="data_parcela[]" class="form-control" required>
+                </div>
+            `;
+            parcelasCamposContainer.appendChild(div);
+        }
+
+        parcelasDiferentesCampos.classList.remove('d-none');
     }
 });
 </script>

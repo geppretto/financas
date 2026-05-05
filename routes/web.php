@@ -14,7 +14,7 @@ Route::get('/', function () {
     if (!auth()->check()) {
         return redirect()->route('login');
     }
-    return view('welcome');
+    return redirect()->route('resumo');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -36,6 +36,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/receitas/create', [ReceitaController::class, 'create'])->name('receitas.create');
     Route::post('/receitas', [ReceitaController::class, 'store'])->name('receitas.store');
     Route::patch('/receitas/{id}/pagar', [ReceitaController::class, 'marcarComoPago'])->name('receitas.pagar');
+    Route::get('/receitas/{id}/edit', [ReceitaController::class, 'edit'])->name('receitas.edit');
+    Route::put('/receitas/{id}', [ReceitaController::class, 'update'])->name('receitas.update');
+    Route::delete('/receitas/{id}', [ReceitaController::class, 'destroy'])->name('receitas.destroy');
 
     // Despesas
     Route::get('/despesas/create', [DespesaController::class, 'create'])->name('despesas.create');
@@ -43,9 +46,12 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/despesas/{id}/pagar', [DespesaController::class, 'marcarComoPago'])->name('despesas.pagar');
     Route::get('/despesas/edit/{id}', [DespesaController::class, 'edit'])->name('despesas.edit');
     Route::put('/despesas/{id}', [DespesaController::class, 'update'])->name('despesas.update');
+    Route::delete('/despesas/{id}', [DespesaController::class, 'destroy'])->name('despesas.destroy');
 
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{id}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 });
-
-

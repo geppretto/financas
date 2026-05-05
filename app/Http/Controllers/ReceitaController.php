@@ -16,17 +16,53 @@ class ReceitaController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'descricao' => ['required', 'string', 'max:255'],
+            'valor' => ['required', 'numeric', 'min:0.01'],
+            'data' => ['nullable', 'date'],
+        ]);
 
         Receita::create([
-            'descricao' => $request->descricao,
-            'valor' => $request->valor,
-            'data' => $request->data,
+            'descricao' => $validated['descricao'],
+            'valor' => $validated['valor'],
+            'data' => $validated['data'] ?? null,
             'user_id' => Auth::id()
         ]);
 
 
         return redirect('/resumo')->with('success', 'Receita cadastrada com sucesso!');
     }
+
+    public function edit($id)
+    {
+        $receita = Receita::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        return view('receitas.edit', compact('receita'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $receita = Receita::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'descricao' => ['required', 'string', 'max:255'],
+            'valor' => ['required', 'numeric', 'min:0.01'],
+            'data' => ['nullable', 'date'],
+        ]);
+
+        $receita->update([
+            'descricao' => $validated['descricao'],
+            'valor' => $validated['valor'],
+            'data' => $validated['data'] ?? null,
+        ]);
+
+        return redirect()->route('resumo')->with('success', 'Receita atualizada com sucesso!');
+    }
+
     public function marcarComoPago(Request $request, $id)
 {
     try {
@@ -81,4 +117,20 @@ class ReceitaController extends Controller
         ], 500);
     }
 }
+
+    public function destroy($id)
+    {
+        $userId = Auth::id();
+        $receita = Receita::where('id', $id)
+            ->where('user_id', $userId)
+            ->firstOrFail();
+
+        PagamentoMensal::where('user_id', $userId)
+            ->where('receita_id', $receita->id)
+            ->delete();
+
+        $receita->delete();
+
+        return redirect()->route('resumo')->with('success', 'Receita excluída com sucesso!');
+    }
 }

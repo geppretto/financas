@@ -3,60 +3,99 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\PagamentoMensal;
+use App\Models\Despesa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    public function index()
+    {
+        $data = now()->addMonth();
+
+        $mes = $data->format('m');
+        $ano = $data->format('Y');
+        $categories = Category::where('user_id', Auth::id())
+            ->withCount('despesas')
+            ->withSum('despesas', 'valor')
+            ->orderBy('name')
+            ->get();
+
+        return view('categories.index', compact('mes', 'ano', 'categories'));
+    }
+
     public function create()
     {
         $data = now()->addMonth();
 
         $mes = $data->format('m');
         $ano = $data->format('Y');
+        $categories = Category::where('user_id', Auth::id())
+            ->withCount('despesas')
+            ->withSum('despesas', 'valor')
+            ->orderBy('name')
+            ->get();
 
-        return view('categories.create', compact('mes', 'ano'));
+        return view('categories.index', compact('mes', 'ano', 'categories'));
     }
 
     public function store(Request $request)
     {
-            Category::create([
-                'name' => $request->name,
-            ]);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
 
-        return redirect()->back()->with('success', 'Categoria criada com sucesso.');
+        Category::create([
+            'name' => $validated['name'],
+            'user_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('categories.index')->with('success', 'Categoria criada com sucesso.');
     }
-    // public function edit($id)
-    // {
-    //     $data = now()->addMonth();
 
-    //     $mes = $data->format('m');
-    //     $ano = $data->format('Y');
+    public function edit($id)
+    {
+        $data = now()->addMonth();
 
-    //     $despesa = Despesa::find($id);
-        
-    //     return view('despesas.edit', compact('despesa', 'mes', 'ano'));
-    // }
-    // public function update(Request $request)
-    // {
-    //     $request->validate([
-    //         'name' => 'required',
-    //     ]);
+        $mes = $data->format('m');
+        $ano = $data->format('Y');
+        $category = $this->findUserCategory($id);
 
-    //     $despesa = Despesa::findOrFail($request->id);
-    //     $despesa->update([
-    //         'name' => $request->name,
-    //         'company_id' => $request->company_id,
-    //         'position' => $request->position,
-    //         'email' => $request->email,
-    //         'cel' => $request->cel,
-    //         'date_request' => $request->date_request,
-    //         'date_meeting' => $request->date_meeting,
-    //         'hour' => $request->hour,
-    //         'number_person' => $request->number_person,
-    //     ]);
+        return view('categories.edit', compact('category', 'mes', 'ano'));
+    }
 
-    //     return redirect()->route('despesas.edit')->with('success', 'Solicitação de Sala em Evento atualizada com sucesso');
-    // }
+    public function update(Request $request, $id)
+    {
+        $category = $this->findUserCategory($id);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $category->update([
+            'name' => $validated['name'],
+        ]);
+
+        return redirect()->route('categories.index')->with('success', 'Categoria atualizada com sucesso.');
+    }
+
+    public function destroy($id)
+    {
+        $category = $this->findUserCategory($id);
+
+        Despesa::where('user_id', Auth::id())
+            ->where('category_id', $category->id)
+            ->update(['category_id' => null]);
+
+        $category->delete();
+
+        return redirect()->route('categories.index')->with('success', 'Categoria excluída com sucesso. As despesas foram mantidas sem categoria.');
+    }
+
+    private function findUserCategory($id): Category
+    {
+        return Category::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+    }
 }
