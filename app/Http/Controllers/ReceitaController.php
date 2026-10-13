@@ -2,35 +2,84 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Receita;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use App\Models\PagamentoMensal;
 use Illuminate\Support\Facades\Auth;
 
 class ReceitaController extends Controller
 {
+    private function categoriasReceita()
+    {
+        return Category::where('tipo', 'receita')
+            ->where('user_id', Auth::id())
+            ->orderBy('name')
+            ->get();
+    }
+
+    private function regraCategoria(): array
+    {
+        return [
+            'nullable',
+            Rule::exists('categories', 'id')->where(fn ($q) => $q->where('tipo', 'receita')->where('user_id', Auth::id())),
+        ];
+    }
+
+    private function regrasReceita(Request $request): array
+    {
+        return [
+            'descricao' => ['required', 'string', 'max:255'],
+            'valor' => ['required', 'numeric', 'min:0.01'],
+            'recorrente' => ['nullable', 'boolean'],
+            'data' => [Rule::requiredIf(!$request->boolean('recorrente')), 'nullable', 'date'],
+            'conta' => ['nullable', 'string', 'max:100'],
+            'category_id' => $this->regraCategoria(),
+        ];
+    }
+
+    private function dadosFormulario(?Receita $receita = null): array
+    {
+        $userId = Auth::id();
+        $mes = now()->format('m');
+        $ano = now()->format('Y');
+
+        return [
+            'receita' => $receita,
+            'categories' => $this->categoriasReceita(),
+            'contas' => Receita::where('user_id', $userId)->whereNotNull('conta')->distinct()->orderBy('conta')->pluck('conta'),
+            'ultimasReceitas' => Receita::where('user_id', $userId)
+                ->with('category')
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->limit(3)
+                ->get(),
+            'totalPrevistoMes' => (float) Receita::where('user_id', $userId)->doMes($mes, $ano)->sum('valor'),
+            'mes' => $mes,
+            'ano' => $ano,
+        ];
+    }
+
     public function create()
     {
-        return view('receitas.create');
+        return view('receitas.create', $this->dadosFormulario());
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'descricao' => ['required', 'string', 'max:255'],
-            'valor' => ['required', 'numeric', 'min:0.01'],
-            'data' => ['nullable', 'date'],
-        ]);
+        $validated = $request->validate($this->regrasReceita($request));
 
         Receita::create([
             'descricao' => $validated['descricao'],
             'valor' => $validated['valor'],
-            'data' => $validated['data'] ?? null,
-            'user_id' => Auth::id()
+            'conta' => $validated['conta'] ?? null,
+            'category_id' => $validated['category_id'] ?? null,
+            'data' => $request->boolean('recorrente') ? null : ($validated['data'] ?? null),
+            'user_id' => Auth::id(),
         ]);
 
-
-        return redirect('/resumo')->with('success', 'Receita cadastrada com sucesso!');
+        return redirect()->route('receitas.create')->with('success', 'Receita cadastrada com sucesso!');
     }
 
     public function edit($id)
@@ -39,7 +88,7 @@ class ReceitaController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        return view('receitas.edit', compact('receita'));
+        return view('receitas.create', $this->dadosFormulario($receita));
     }
 
     public function update(Request $request, $id)
@@ -48,16 +97,14 @@ class ReceitaController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        $validated = $request->validate([
-            'descricao' => ['required', 'string', 'max:255'],
-            'valor' => ['required', 'numeric', 'min:0.01'],
-            'data' => ['nullable', 'date'],
-        ]);
+        $validated = $request->validate($this->regrasReceita($request));
 
         $receita->update([
             'descricao' => $validated['descricao'],
             'valor' => $validated['valor'],
-            'data' => $validated['data'] ?? null,
+            'conta' => $validated['conta'] ?? null,
+            'category_id' => $validated['category_id'] ?? null,
+            'data' => $request->boolean('recorrente') ? null : ($validated['data'] ?? null),
         ]);
 
         return redirect()->route('resumo')->with('success', 'Receita atualizada com sucesso!');
