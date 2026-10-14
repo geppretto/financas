@@ -1,7 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
+    <script>
+        // Aplica o tema salvo antes de renderizar (evita "piscar"). Persiste no navegador:
+        // continua o mesmo ao entrar, sair ou fechar o site, até você trocar.
+        (function () {
+            try {
+                var t = localStorage.getItem('financas-tema');
+                if (t === 'dark' || t === 'light') {
+                    document.documentElement.dataset.theme = t;
+                    document.documentElement.dataset.bsTheme = t;
+                }
+            } catch (e) {}
+        })();
+    </script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Sistema Financeiro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -325,6 +338,228 @@
 
         html, body { overflow-x: hidden; }
 
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 0;
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+        }
+        .theme-toggle:hover { background: rgba(255, 255, 255, 0.18); }
+        .theme-toggle svg { width: 16px; height: 16px; }
+        .theme-toggle .ic-sun { display: none; }
+        html[data-theme="dark"] .theme-toggle .ic-moon { display: none; }
+        html[data-theme="dark"] .theme-toggle .ic-sun { display: inline-block; }
+
+        /* ===================== MODO NOTURNO ===================== */
+        html[data-theme="dark"] {
+            --page-bg: #0b1220;
+            --surface: #111a2e;
+            --border: #22304a;
+            --text: #e6edf7;
+            --muted: #9fb0c8;
+            color-scheme: dark;
+        }
+        html[data-theme="dark"] body { background: #0b1220; color: #e6edf7; }
+        html[data-theme="dark"] .topbar { background: #070d1a; border-bottom: 1px solid #1a2740; }
+        html[data-theme="dark"] .app-footer { background: #0f1729; border-top-color: #1a2740; color: #9fb0c8; }
+        html[data-theme="dark"] .app-footer .mono { color: #7f91ad; }
+        html[data-theme="dark"] .panel,
+        html[data-theme="dark"] .insight-card { background: #111a2e; border-color: #22304a; }
+        html[data-theme="dark"] .panel-header { border-bottom-color: #22304a; }
+        html[data-theme="dark"] .table thead th { background: #16223a; color: #9fb0c8; }
+        html[data-theme="dark"] .table tbody tr.is-paid { background: #0f2a22; }
+        html[data-theme="dark"] .table tbody tr.is-open { background: #2d1820; }
+        html[data-theme="dark"] .badge-soft { background: #1c2a45; color: #cbd5e1; }
+        html[data-theme="dark"] .form-control,
+        html[data-theme="dark"] .form-select { background-color: #16223a; border-color: #2a3a57; color: #e6edf7; }
+        html[data-theme="dark"] .bg-light { background-color: #16223a !important; }
+        html[data-theme="dark"] .text-muted { color: #9fb0c8 !important; }
+        html[data-theme="dark"] .form-label { color: #9fb0c8; }
+        html[data-theme="dark"] .list-group-item { background: #111a2e; color: #e6edf7; border-color: #22304a; }
+        html[data-theme="dark"] .list-group-item-action:hover { background: #16223a; }
+        html[data-theme="dark"] .alert-success { background: #0f2a22; color: #86efac; }
+        html[data-theme="dark"] .alert-danger { background: #2d1820; color: #fda4af; }
+        html[data-theme="dark"] .alert-info { background: #14243f; color: #93c5fd; }
+
+        /* Bolinhas de legenda que usam a cor "tinta" ficariam invisíveis */
+        html[data-theme="dark"] i[style*="#0a1222"] { background: #e6edf7 !important; }
+        html[data-theme="dark"] .rs-bar > span,
+        html[data-theme="dark"] .rs-tabs button.active { }
+
+        /* ---- Home (rs) ---- */
+        html[data-theme="dark"] .rs { color: #e6edf7; }
+        html[data-theme="dark"] .rs-card { background: #111a2e; border-color: #22304a; box-shadow: none; }
+        html[data-theme="dark"] .rs-hello { background: #1a2842; }
+        html[data-theme="dark"] .rs-hello .mono, html[data-theme="dark"] .rs-fiscal, html[data-theme="dark"] .rs-meta { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-fiscal { border-left-color: #2a3a57; }
+        html[data-theme="dark"] .rs-select { background-color: #1a2842; color: #e6edf7; }
+        html[data-theme="dark"] .rs-select option { background: #111a2e; color: #e6edf7; }
+        html[data-theme="dark"] .rs-btn-dark { background: #e6edf7; color: #0a1222; }
+        html[data-theme="dark"] .rs-btn-icon { background: #16223a; border-color: #2a3a57; color: #cbd5e1; }
+        html[data-theme="dark"] .rs-ico.blue { background: rgba(37, 99, 235, .2); color: #7aa7ff; }
+        html[data-theme="dark"] .rs-ico.red { background: rgba(220, 38, 38, .2); color: #ff8a93; }
+        html[data-theme="dark"] .rs-ico.green { background: rgba(22, 163, 74, .2); color: #5ee9a0; }
+        html[data-theme="dark"] .rs-ico.slate { background: #1c2a45; color: #cbd5e1; }
+        html[data-theme="dark"] .rs-kpi-title, html[data-theme="dark"] .rs-kpi-sub { color: #cbd5e1; }
+        html[data-theme="dark"] .rs-kpi-foot { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-kpi-foot .strong { color: #e6edf7; }
+        html[data-theme="dark"] .rs-kpi-value.green { color: #34d399; }
+        html[data-theme="dark"] .rs-chip.green { background: rgba(34, 197, 94, .18); color: #4ade80; }
+        html[data-theme="dark"] .rs-chip.blue { background: rgba(59, 130, 246, .2); color: #93c5fd; }
+        html[data-theme="dark"] .rs-chip.red { background: rgba(244, 63, 94, .2); color: #fda4af; }
+        html[data-theme="dark"] .rs-chip.slate { background: #1c2a45; color: #cbd5e1; }
+        html[data-theme="dark"] .rs-bar { background: #22304a; }
+        html[data-theme="dark"] .rs-bar > span { background: #e6edf7; }
+        html[data-theme="dark"] .rs-eye { color: #cbd5e1; }
+        html[data-theme="dark"] .rs-insight .label { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-insight .hint.red { color: #fda4af; }
+        html[data-theme="dark"] .rs-insight .hint.green { color: #4ade80; }
+        html[data-theme="dark"] .rs-insight .hint.slate { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-panel-head .sub { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-tag { background: #1c2a45; color: #cbd5e1; }
+        html[data-theme="dark"] .rs-legend { color: #cbd5e1; }
+        html[data-theme="dark"] .rs-donut-center span, html[data-theme="dark"] .rs-cat-row .pct, html[data-theme="dark"] .rs-chart-foot { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-aviso { background: #14243f; border-color: #22406e; color: #cbd5e1; }
+        html[data-theme="dark"] .rs-aviso a { color: #7aa7ff; }
+        html[data-theme="dark"] .rs-tabs { background: #1a2842; }
+        html[data-theme="dark"] .rs-tabs button { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-tabs button.active { background: #2a3a57; color: #fff; box-shadow: none; }
+        html[data-theme="dark"] .rs-table thead th { background: #16223a; color: #9fb0c8; }
+        html[data-theme="dark"] .rs-table tbody td { border-bottom-color: #1a2740; }
+        html[data-theme="dark"] .rs-table .desc small { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-table .act a, html[data-theme="dark"] .rs-table .act button { color: #cbd5e1; }
+        html[data-theme="dark"] .rs-status.pago { background: rgba(34, 197, 94, .18); color: #4ade80; }
+        html[data-theme="dark"] .rs-status.pend { background: rgba(245, 158, 11, .18); color: #fbbf24; }
+        html[data-theme="dark"] .rs-table tr.urg-azul td { background: #14243f; }
+        html[data-theme="dark"] .rs-table tr.urg-amarelo td { background: #33290f; }
+        html[data-theme="dark"] .rs-table tr.urg-vermelho td { background: #3a1820; }
+        html[data-theme="dark"] .rs-table tr.urg-ok td { background: #0f2a22; }
+        html[data-theme="dark"] .rs-table tr.linha-despesa + tr.linha-despesa td { border-top-color: #111a2e; }
+        html[data-theme="dark"] .rs-table tr.urg-vermelho .desc small { color: #fda4af; }
+        html[data-theme="dark"] .rs-table tr.urg-amarelo .desc small { color: #fbbf24; }
+        html[data-theme="dark"] .rs-empty { background: #16223a; }
+        html[data-theme="dark"] .rs-empty .badge-ico { background: #111a2e; }
+        html[data-theme="dark"] .rs-empty p { color: #9fb0c8; }
+        html[data-theme="dark"] .rs-table-foot, html[data-theme="dark"] .rs-table-foot a { color: #cbd5e1; }
+        html[data-theme="dark"] .rs-table-foot a.green { color: #4ade80; }
+        html[data-theme="dark"] .rs-scroll { scrollbar-color: #2a3a57 transparent; }
+        html[data-theme="dark"] .rs-scroll::-webkit-scrollbar-thumb { background: #2a3a57; }
+        @media (max-width: 640px) {
+            html[data-theme="dark"] .rs-table tbody tr { background: #16223a; }
+            html[data-theme="dark"] .rs-table tr.urg-azul { background: #14243f; }
+            html[data-theme="dark"] .rs-table tr.urg-amarelo { background: #33290f; }
+            html[data-theme="dark"] .rs-table tr.urg-vermelho { background: #3a1820; }
+            html[data-theme="dark"] .rs-table tr.urg-ok { background: #0f2a22; }
+        }
+
+        /* ---- Categorias (ct) ---- */
+        html[data-theme="dark"] .ct { color: #e6edf7; }
+        html[data-theme="dark"] .ct-card { background: #111a2e; border-color: #22304a; box-shadow: none; }
+        html[data-theme="dark"] .ct-crumb, html[data-theme="dark"] .ct-sub { color: #9fb0c8; }
+        html[data-theme="dark"] .ct-crumb strong { color: #e6edf7; }
+        html[data-theme="dark"] .ct-teto, html[data-theme="dark"] .ct-export { background: #111a2e; border-color: #22304a; color: #cbd5e1; box-shadow: none; }
+        html[data-theme="dark"] .ct-teto strong, html[data-theme="dark"] .ct-export { color: #e6edf7; }
+        html[data-theme="dark"] .ct-mode { background: rgba(34, 197, 94, .18); color: #4ade80; }
+        html[data-theme="dark"] .ct-mode.edit { background: rgba(245, 158, 11, .18); color: #fbbf24; }
+        html[data-theme="dark"] .ct-lbl { color: #cbd5e1; }
+        html[data-theme="dark"] .ct-lbl .mono, html[data-theme="dark"] .ct-help, html[data-theme="dark"] .ct-name .s { color: #9fb0c8; }
+        html[data-theme="dark"] .ct-input, html[data-theme="dark"] .ct-money, html[data-theme="dark"] .ct-search input { background: #1a2842; color: #e6edf7; }
+        html[data-theme="dark"] .ct-money input { color: #e6edf7; }
+        html[data-theme="dark"] .ct-input::placeholder, html[data-theme="dark"] .ct-search input::placeholder { color: #7f91ad; }
+        html[data-theme="dark"] .ct-input-wrap svg, html[data-theme="dark"] .ct-search svg { color: #9fb0c8; }
+        html[data-theme="dark"] .ct-tipo label { background: #1a2842; color: #cbd5e1; }
+        html[data-theme="dark"] .ct-tipo input:checked + label { background: #e6edf7; color: #0a1222; }
+        html[data-theme="dark"] .ct-icons, html[data-theme="dark"] .ct-colors { background: #1a2842; }
+        html[data-theme="dark"] .ct-icons label { color: #cbd5e1; }
+        html[data-theme="dark"] .ct-icons input:checked + label { background: #2a3a57; box-shadow: none; }
+        html[data-theme="dark"] .ct-colors input:checked + label { box-shadow: 0 0 0 2px #1a2842, 0 0 0 4px #e6edf7; }
+        html[data-theme="dark"] .ct-save { background: #e6edf7; color: #0a1222; }
+        html[data-theme="dark"] .ct-save:hover { background: #fff; }
+        html[data-theme="dark"] .ct-clear { background: #1a2842; color: #cbd5e1; }
+        html[data-theme="dark"] .ct-auto-ico { background: #16223a; }
+        html[data-theme="dark"] .ct-auto p { color: #9fb0c8; }
+        html[data-theme="dark"] .ct-count { background: #1c2a45; color: #cbd5e1; }
+        html[data-theme="dark"] .ct-table thead th { background: #16223a; color: #9fb0c8; }
+        html[data-theme="dark"] .ct-meta .row1 { color: #9fb0c8; }
+        html[data-theme="dark"] .ct-track { background: #22304a; }
+        html[data-theme="dark"] .ct-acts a, html[data-theme="dark"] .ct-acts button { color: #cbd5e1; }
+        html[data-theme="dark"] .ct-foot .mono { color: #9fb0c8; }
+        @media (max-width: 640px) {
+            html[data-theme="dark"] .ct-table tbody tr { background: #16223a; }
+            html[data-theme="dark"] .ct-table td:nth-child(2)::before, html[data-theme="dark"] .ct-table td:nth-child(3)::before { color: #9fb0c8; }
+        }
+
+        /* ---- Nova despesa (nd) ---- */
+        html[data-theme="dark"] .nd { color: #e6edf7; }
+        html[data-theme="dark"] .nd-card { background: #111a2e; border-color: #22304a; box-shadow: none; }
+        html[data-theme="dark"] .nd-crumb, html[data-theme="dark"] .nd-crumb a, html[data-theme="dark"] .nd-sub, html[data-theme="dark"] .nd-head p { color: #cbd5e1; }
+        html[data-theme="dark"] .nd-tag-red { background: rgba(244, 63, 94, .2); color: #fda4af; }
+        html[data-theme="dark"] .nd-budget { background: #16223a; color: #cbd5e1; }
+        html[data-theme="dark"] .nd-ico-red { background: rgba(220, 38, 38, .2); color: #ff8a93; }
+        html[data-theme="dark"] .nd-head { border-bottom-color: #22304a; }
+        html[data-theme="dark"] .nd-chip { background: #1c2a45; color: #cbd5e1; }
+        html[data-theme="dark"] .nd-label { color: #e6edf7; }
+        html[data-theme="dark"] .nd-field { background: #1a2842; box-shadow: none; }
+        html[data-theme="dark"] .nd-field input, html[data-theme="dark"] .nd-field select, html[data-theme="dark"] .nd-field textarea { color: #e6edf7; }
+        html[data-theme="dark"] .nd-field input::placeholder, html[data-theme="dark"] .nd-field textarea::placeholder { color: #7f91ad; }
+        html[data-theme="dark"] .nd-field > svg, html[data-theme="dark"] .nd-field .prefix { color: #9fb0c8; }
+        html[data-theme="dark"] .nd-field select option { background: #111a2e; color: #e6edf7; }
+        html[data-theme="dark"] .nd-parcelas { background: #16223a; }
+        html[data-theme="dark"] .nd-parcelas .hint { color: #9fb0c8; }
+        html[data-theme="dark"] .nd-parcelas input[type=checkbox] { accent-color: #60a5fa; }
+        html[data-theme="dark"] .nd-parcelas-box { background: #14203a; }
+        html[data-theme="dark"] .nd-status { box-shadow: none; border: 1px solid #22304a; }
+        html[data-theme="dark"] .nd-status p, html[data-theme="dark"] .nd-notes-head .mono { color: #9fb0c8; }
+        html[data-theme="dark"] .nd-seg { background: #1a2842; }
+        html[data-theme="dark"] .nd-seg label { color: #9fb0c8; }
+        html[data-theme="dark"] .nd-seg input:checked + label { background: #2a3a57; box-shadow: none; }
+        html[data-theme="dark"] .nd-seg input[value="1"]:checked + label { color: #4ade80; }
+        html[data-theme="dark"] .nd-seg input[value="0"]:checked + label { color: #fbbf24; }
+        html[data-theme="dark"] .nd-actions { border-top-color: #22304a; }
+        html[data-theme="dark"] .nd-btn.light { background: #1a2842; color: #e6edf7; }
+        html[data-theme="dark"] .nd-overview-body { background: #16223a; }
+        html[data-theme="dark"] .nd-bar-row .track { background: #22304a; }
+        html[data-theme="dark"] .nd-side-title .mono, html[data-theme="dark"] .nd-progress-foot, html[data-theme="dark"] .nd-last-main .m { color: #9fb0c8; }
+        html[data-theme="dark"] .nd-progress { background: #22304a; }
+        html[data-theme="dark"] .nd-tip { background: #14243f; }
+        html[data-theme="dark"] .nd-tip p, html[data-theme="dark"] .nd-tip svg { color: #cbd5e1; }
+        html[data-theme="dark"] .nd-donut-center span { color: #9fb0c8; }
+        html[data-theme="dark"] .nd-last-item { border-bottom-color: #22304a; }
+        html[data-theme="dark"] .nd-last-ico { background: #1c2a45; color: #e6edf7; }
+        html[data-theme="dark"] .nd-last-val { color: #fda4af; }
+        html[data-theme="dark"] .nd a[style*="color:#0a1222"] { color: #e6edf7 !important; }
+        html[data-theme="dark"] .nd .form-text, html[data-theme="dark"] .nd div[style*="color:#475569"] { color: #9fb0c8 !important; }
+
+        /* ---- Nova receita (nr) ---- */
+        html[data-theme="dark"] .nr { color: #e6edf7; }
+        html[data-theme="dark"] .nr-crumb, html[data-theme="dark"] .nr-sub, html[data-theme="dark"] .nr-head p, html[data-theme="dark"] .nr-hint, html[data-theme="dark"] .nr-help { color: #9fb0c8; }
+        html[data-theme="dark"] .nr-crumb .tag { background: rgba(34, 197, 94, .18); color: #4ade80; }
+        html[data-theme="dark"] .nr-back { background: #111a2e; border-color: #22304a; color: #e6edf7; box-shadow: none; }
+        html[data-theme="dark"] .nr-card { background: #111a2e; border-color: #22304a; box-shadow: none; }
+        html[data-theme="dark"] .nr-head, html[data-theme="dark"] .nr-last-head, html[data-theme="dark"] .nr-total { background: #16223a; }
+        html[data-theme="dark"] .nr-brl { background: #111a2e; box-shadow: none; }
+        html[data-theme="dark"] .nr-field { background: #1a2842; }
+        html[data-theme="dark"] .nr-field input, html[data-theme="dark"] .nr-field select { color: #e6edf7; }
+        html[data-theme="dark"] .nr-field input::placeholder { color: #7f91ad; }
+        html[data-theme="dark"] .nr-field svg { color: #9fb0c8; }
+        html[data-theme="dark"] .nr-field select option { background: #111a2e; color: #e6edf7; }
+        html[data-theme="dark"] .nr-rec { background: #16223a; }
+        html[data-theme="dark"] .nr-rec-ico { background: #111a2e; }
+        html[data-theme="dark"] .nr-rec-text span { color: #9fb0c8; }
+        html[data-theme="dark"] .nr-switch .track { background: #2a3a57; }
+        html[data-theme="dark"] .nr-btn.light { background: #1a2842; color: #e6edf7; }
+        html[data-theme="dark"] .nr-btn.dark { background: #e6edf7; color: #0a1222; }
+        html[data-theme="dark"] .nr-last-head a, html[data-theme="dark"] .nr-item-bot { color: #9fb0c8; }
+        html[data-theme="dark"] .nr-item-top .v { color: #4ade80; }
+        html[data-theme="dark"] .nr-tip { background: #14243f; color: #cbd5e1; }
+        html[data-theme="dark"] .nr-tip b { color: #e6edf7; }
+        html[data-theme="dark"] .nr-tip svg { color: #cbd5e1; }
+
+
         @media (max-width: 991.98px) {
             /* Topo em grade: marca | usuário, menu rolável, ações lado a lado */
             .topbar {
@@ -374,11 +609,17 @@
                 @endauth
             </div>
 
-            @auth
-                <div class="topbar-right">
+            <div class="topbar-right">
+                @auth
                     <a href="{{ route('receitas.create') }}" class="top-action in"><i data-lucide="plus"></i> Nova receita</a>
                     <a href="{{ route('despesas.create') }}" class="top-action out"><i data-lucide="minus"></i> Nova despesa</a>
-                    <div class="top-user">
+                @endauth
+                <div class="top-user">
+                    <button type="button" class="theme-toggle" id="themeToggle" title="Alternar modo claro / noturno" aria-label="Alternar modo claro / noturno">
+                        <i data-lucide="moon" class="ic-moon"></i>
+                        <i data-lucide="sun" class="ic-sun"></i>
+                    </button>
+                    @auth
                         {{-- <div class="top-user-text">
                             <div class="top-user-name">{{ auth()->user()->name }}</div>
                             <div class="top-user-plan">Plano Individual Pro</div>
@@ -388,9 +629,9 @@
                             @csrf
                             <button type="submit" class="top-logout" title="Sair"><i data-lucide="log-out"></i></button>
                         </form>
-                    </div>
+                    @endauth
                 </div>
-            @endauth
+            </div>
         </header>
 
         <main class="content-area @yield('content_class', 'content-narrow')">
@@ -416,5 +657,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
     <script>window.lucide && lucide.createIcons();</script>
+    <script>
+        document.getElementById('themeToggle')?.addEventListener('click', function () {
+            var atual = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+            var novo = atual === 'dark' ? 'light' : 'dark';
+            document.documentElement.dataset.theme = novo;
+            document.documentElement.dataset.bsTheme = novo;
+            try { localStorage.setItem('financas-tema', novo); } catch (e) {}
+            window.dispatchEvent(new CustomEvent('themechange', { detail: novo }));
+        });
+    </script>
 </body>
 </html>

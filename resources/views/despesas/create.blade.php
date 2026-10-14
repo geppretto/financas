@@ -421,16 +421,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('maioresGastosChart');
     if (canvas && window.Chart) {
         const valores = @json($maioresGastos->values());
-        const cores = @json($coresTop);
+        const temaEscuro = () => document.documentElement.dataset.theme === 'dark';
+        const coresTema = () => @json($coresTop).map((c) => (c === '#0a1222' && temaEscuro() ? '#e6edf7' : c));
+        const cores = coresTema();
         const usado = {{ round(min(max($pctUsado, 0), 100), 2) }};
         const temDados = valores.length > 0;
-        new Chart(canvas, {
+        const donutGastos = new Chart(canvas, {
             type: 'doughnut',
             data: {
                 labels: temDados ? @json($maioresGastos->keys()) : ['Sem gastos'],
                 datasets: [{
                     data: temDados ? valores : [1],
-                    backgroundColor: temDados ? cores : ['#e8edf5'],
+                    backgroundColor: temDados ? cores : [temaEscuro() ? '#22304a' : '#e8edf5'],
                     borderWidth: 0,
                 }],
             },
@@ -438,6 +440,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 responsive: true, maintainAspectRatio: false, cutout: '72%',
                 plugins: { legend: { display: false }, tooltip: { enabled: temDados } },
             },
+        });
+
+        // Atualiza as cores quando o tema é trocado, sem perder o que foi digitado no formulário
+        window.addEventListener('themechange', () => {
+            donutGastos.data.datasets[0].backgroundColor = temDados ? coresTema() : [temaEscuro() ? '#22304a' : '#e8edf5'];
+            donutGastos.update();
         });
     }
 

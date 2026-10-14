@@ -114,6 +114,8 @@
     .rs-cat-row .name i { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
     .rs-cat-row .val { font-family: 'JetBrains Mono', monospace; font-size: .72rem; font-weight: 600; }
     .rs-cat-row .pct { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: #64748b; text-align: right; }
+    .rs-aviso { padding: .8rem 1.1rem; margin: -0.75rem 0 1.25rem; background: #eaf1fe; border-color: #dbe7fd; font-size: .85rem; }
+    .rs-aviso a { margin-left: .4rem; }
     .rs-tabs { display: inline-flex; background: #eef2f8; border-radius: 8px; padding: 3px; gap: 2px; }
     .rs-tabs button { border: 0; background: transparent; font-size: .72rem; font-weight: 600; color: #475569; padding: .3rem .65rem; border-radius: 6px; }
     .rs-tabs button.active { background: #fff; color: #0a1222; box-shadow: 0 1px 2px rgba(15, 23, 42, .12); }
@@ -285,7 +287,7 @@
     </form>
 
     @if ($mesAutomatico)
-        <div class="rs-card" style="padding:.8rem 1.1rem;margin:-0.75rem 0 1.25rem;background:#eaf1fe;border-color:#dbe7fd;font-size:.85rem">
+        <div class="rs-card rs-aviso">
             <i data-lucide="circle-check" style="color:#15803d"></i>
             Todas as contas do mês atual estão pagas — exibindo <strong>{{ $mesNome }} de {{ $ano }}</strong>.
             <a href="{{ route('resumo', ['mes' => now()->format('m'), 'ano' => now()->format('Y')]) }}" style="margin-left:.4rem">Ver mês atual</a>
@@ -635,9 +637,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const money = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
     const mono = { family: "'JetBrains Mono', monospace", size: 10 };
 
+    // Cores dos gráficos conforme o tema (a troca recarrega a página para redesenhar)
+    const dark = document.documentElement.dataset.theme === 'dark';
+    const ink = dark ? '#e6edf7' : '#0a1222';
+    const gridColor = dark ? '#22304a' : '#eef1f6';
+    const barOutra = dark ? '#2a3a57' : '#d7e2f4';
+    const corSemDados = dark ? '#22304a' : '#e8edf5';
+    window.addEventListener('themechange', () => window.location.reload());
+
     if (window.Chart) {
         Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
-        Chart.defaults.color = '#64748b';
+        Chart.defaults.color = dark ? '#9fb0c8' : '#64748b';
     }
 
     // Evolução mensal
@@ -663,7 +673,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [
                     mk('Entradas', chartData.receitas, '#16a36a', '22, 163, 106', true),
                     mk('Saídas', chartData.despesas, '#c0161c', '192, 22, 28', true),
-                    mk('Saldo', chartData.saldo, '#0a1222', '10, 18, 34', false),
+                    mk('Saldo', chartData.saldo, ink, '10, 18, 34', false),
                 ],
             },
             options: {
@@ -677,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     x: { grid: { display: false }, border: { display: false }, ticks: { font: mono } },
                     y: {
                         border: { display: false },
-                        grid: { color: '#eef1f6', borderDash: [4, 4] },
+                        grid: { color: gridColor, borderDash: [4, 4] },
                         ticks: { display: false },
                     },
                 },
@@ -688,7 +698,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Categorias
     const cat = document.getElementById('categoriasChart');
     if (cat && window.Chart) {
-        const cores = @json($coresCategorias);
+        const cores = @json($coresCategorias).map((c) => (c === '#0a1222' ? ink : c));
         const grupos = {
             categoria: { labels: chartData.categoriasLabels, valores: chartData.categoriasValores },
             origem: { labels: chartData.origemLabels, valores: chartData.origemValores },
@@ -698,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return {
                 labels: tem ? grupos[g].labels : ['Sem gastos'],
                 data: tem ? grupos[g].valores : [1],
-                cores: tem ? cores : ['#e8edf5'],
+                cores: tem ? cores : [corSemDados],
                 tem,
             };
         };
@@ -746,7 +756,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     label: 'Gastos',
                     data: chartData.despesas,
-                    backgroundColor: chartData.labels.map((_, i) => (i === selecionado ? '#0a1222' : '#d7e2f4')),
+                    backgroundColor: chartData.labels.map((_, i) => (i === selecionado ? ink : barOutra)),
                     borderRadius: 6,
                     maxBarThickness: 22,
                 }],
@@ -778,33 +788,6 @@ document.addEventListener('DOMContentLoaded', function () {
     eye?.addEventListener('click', () => {
         document.querySelectorAll('.rs-secret').forEach((el) => el.classList.toggle('is-hidden'));
     });
-
-    // Histórico de despesas liquidadas
-    const tabela = document.getElementById('despesasTabela');
-    const vazio = document.getElementById('despesasVazio');
-    let mostrandoLiquidadas = false;
-
-    const atualizarDespesas = () => {
-        if (!tabela) return;
-        const linhas = [...tabela.querySelectorAll('.linha-despesa')];
-        linhas.forEach((l) => {
-            const pago = l.dataset.pago === '1';
-            l.style.display = pago && !mostrandoLiquidadas ? 'none' : '';
-        });
-        const visiveis = linhas.some((l) => l.style.display !== 'none');
-        tabela.style.display = visiveis ? '' : 'none';
-        if (vazio) vazio.style.display = visiveis ? 'none' : '';
-        const rodape = document.getElementById('toggleHistoricoRodape');
-        if (rodape) rodape.textContent = mostrandoLiquidadas ? 'Ocultar liquidadas' : 'Mostrar liquidadas';
-    };
-
-    const alternarHistorico = (e) => {
-        e.preventDefault();
-        mostrandoLiquidadas = !mostrandoLiquidadas;
-        atualizarDespesas();
-    };
-    document.getElementById('toggleHistorico')?.addEventListener('click', alternarHistorico);
-    document.getElementById('toggleHistoricoRodape')?.addEventListener('click', alternarHistorico);
 
     // Marcar como pago
     document.querySelectorAll('.marcar-pago').forEach((btn) => {
